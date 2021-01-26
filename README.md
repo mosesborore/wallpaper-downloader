@@ -12,4 +12,4 @@ and __wget__ module to download the images.
 if you're on linux: create virtual environment, install the _requirements.txt_. then *source linux_env/bin/activate*, finally *python main.py*
 On windows: start by *env\scripts\activate*, then *python main.py*
 
-![code in](/img/screensho.png)
+![code in](/img/Screensho.png)
