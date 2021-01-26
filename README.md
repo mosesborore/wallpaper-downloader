@@ -1,6 +1,6 @@
 # wallpaper downloader
 
-It basically uses __requests__ python module to sent a request to <https://wallpaperscraft/com>
+It basically uses __requests__ python module to sent a request to <https://wallpaperscraft.com>
 using  __Beautifulsoup__ class to scrap for the HTML anchor tags with *class="wallpapers__link"* then
 extract the value of __href__
 
