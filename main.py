@@ -6,6 +6,12 @@ from bs4 import BeautifulSoup
 import random
 import errors
 
+# create the images folder
+try:
+	os.mkdir('images')
+except:
+	pass
+
 version = '0.1.0'
 
 # images path
