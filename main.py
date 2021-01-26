@@ -133,7 +133,7 @@ def search_catalog():
     # based on their category
     catalog_url = 'https://wallpaperscraft.com/catalog/'
 
-    if pages > 0:
+    if pages > 0 and category != 'all':
         for i in range(1, pages+1):
             # temporary url used to download page 1,2,3....
             temp_url = catalog_url+category+f'/page{i}'
@@ -142,6 +142,10 @@ def search_catalog():
             markup = get_markup(temp_url)
             hrefs = parse(markup)
             download(hrefs)
+	else:
+		markup = get_markup(URL)
+		hrefs = parse(markup)
+		download(hrefs)
 
 
 if __name__ == '__main__':
