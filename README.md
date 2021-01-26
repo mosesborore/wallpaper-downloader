@@ -9,7 +9,7 @@ and __wget__ module to download the images.
 
 ![How the anchor is describe on the website](/img/anchor_tag.png)
 
-if you're on linux: start by activating the virtual environment *source linux_env/bin/activate*, then *python main.py*
+if you're on linux: create virtual environment, install the _requirements.txt_. then *source linux_env/bin/activate*, finally *python main.py*
 On windows: start by *env\scripts\activate*, then *python main.py*
 
 ![code in](/img/screenshot.png)
