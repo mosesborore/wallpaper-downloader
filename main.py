@@ -5,24 +5,19 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import errors
+import pathlib
 
+
+img_dir = None
 # create the images folder
 try:
 	os.mkdir('images')
+	img_dir = pathlib.path(__file__).resolve().parent
+	img_dir = img_dir.joinpath("image")
 except:
 	pass
 
 version = '0.1.0'
-
-# create the images folder
-try:
-	os.mkdir('images')
-except:
-	pass
-
-# images path
-img_dir = os.path.dirname(os.path.realpath(__file__))
-img_dir = os.path.join(img_dir, 'images')
 
 
 # colors
@@ -131,22 +126,23 @@ def download(hrefs):
 			total -= 1
 			print(f"\nDownload complete. {total} remaining")
 		except KeyboardInterrupt:
-			print(R+"please wait until the download completes")
+			print(R+"please wait until the download completes"+W)
 		except:
-			print("\nimage not found. Trying to download next\n")
+			print(C+"\nimage not found. Trying to download next\n"+W)
 			continue
 
 
 def search_catalog():
 	category = input("Enter the category you want: (default is all): ")
-	pages = int(input("Enter how many pages to go through: (MAX => 10): "))
+	start_page = int(input("Enter page number to start with: (default => 1): "))
+	end_page = int(input("Enter page number to end with: (default => 1): "))
 
 	# root url for all images to be downloaded
 	# based on their category
 	catalog_url = 'https://wallpaperscraft.com/catalog/'
 
-	if pages > 0 and category != 'all':
-		for i in range(1, pages+1):
+	if start_page > 0 and category != 'all':
+		for i in range(start_page, end_page+1):
 			# temporary url used to download page 1,2,3....
 			temp_url = catalog_url+category+f'/page{i}'
 			print("\nURL: ", temp_url)
