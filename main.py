@@ -5,20 +5,13 @@ import requests
 from bs4 import BeautifulSoup
 import random
 import errors
-import pathlib
-
-
-img_dir = None
-# create the images folder
-try:
-	os.mkdir('images')
-	img_dir = pathlib.path(__file__).resolve().parent
-	img_dir = img_dir.joinpath("image")
-except:
-	pass
 
 version = '0.1.0'
 
+try:
+	os.mkdir("images")
+except:
+	pass
 
 # colors
 R = '\033[31m'  # red
@@ -54,6 +47,21 @@ def network():
 		sys.exit(0)
 
 
+def menu():
+	print("\u0332".join("CATEGORIES OF WALLPAPER"))
+	print("""
+		1. ALL 					11. FOOD
+		2. ABSTRACT				12. MOTORCYCLES
+		3. CITY					13. NATURE
+		4. MINIMALISM				15. SPORT
+		5. MUSIC				16. WORDS
+		6. SPACE
+		7. TECHNOLOGIES -use hi-tech
+		8. VECTOR
+		9. LOVE
+		10. ANIME
+		""")
+
 def random_user_agents():
 	""" returns random user-agents from the list """
 	UA = user_agent_list = [
@@ -88,72 +96,88 @@ def get_markup(url):
 
 def parse(markup):
 	""" parse the markup and extracts the html 'a' tags
-	which has the href links to the images
+	which have the href links to the images
 	"""
-	soup = BeautifulSoup(markup, 'lxml')
+	try:
+		soup = BeautifulSoup(markup, 'lxml')
 
-	anchors_tags = soup.find_all('a', {'class': 'wallpapers__link'})
+		anchors_tags = soup.find_all('a', {'class': 'wallpapers__link'})
 
-	hrefs = []
+		hrefs = []
 
-	for a_tag in anchors_tags:
-		hrefs.append(a_tag.get("href"))
+		for a_tag in anchors_tags:
+			hrefs.append(a_tag.get("href"))
 
-	return hrefs
+		return hrefs
+	except TypeError:
+		print(C+"Make sure you enter the category name correct"+W)
 
 
 def download(hrefs):
 	""" download the images """
 
-	download_url = 'https://images.wallpaperscraft.com/image/'
+	try:
 
-	links = []
+		download_url = 'https://images.wallpaperscraft.com/image/'
 
-	for i in hrefs:
-		i = i.replace("/wallpaper/", '')
-		link = download_url+f'{i}'+'_1920x1080.jpg'
-		links.append(link)
+		links = []
 
-	# change the dir to images
-	os.chdir(img_dir)
+		for i in hrefs:
+			i = i.replace("/wallpaper/", '')
+			link = download_url+f'{i}'+'_1920x1080.jpg'
+			links.append(link)
 
-	total = len(links)
 
-	for link in links:
-		print(link)
-		try:
-			wget.download(link)
-			total -= 1
-			print(f"\nDownload complete. {total} remaining")
-		except KeyboardInterrupt:
-			print(R+"please wait until the download completes"+W)
-		except:
-			print(C+"\nimage not found. Trying to download next\n"+W)
-			continue
+		total = len(links)
+
+		for link in links:
+			print(link)
+			try:
+				wget.download(link, out='./images')
+				total -= 1
+				print(f"\nDownload complete. {total} remaining")
+			except KeyboardInterrupt:
+				temp = input("\nDo you want to cancel download: Y(YES) || N (NO):\n")
+				if temp.lower() == 'yes' or temp == 'y':
+					raise errors.WantToCancelDownload("Download has been cancalled")
+				else:
+					continue
+			except:
+				print(C+"\nimage not found. Trying to download next\n"+W)
+				continue
+	except TypeError:
+		print(C+"Make sure you enter the category name correct"+W)
 
 
 def search_catalog():
-	category = input("Enter the category you want: (default is all): ")
-	start_page = int(input("Enter page number to start with: (default => 1): "))
-	end_page = int(input("Enter page number to end with: (default => 1): "))
+	try:
+		category = input("Enter the category you want: (default is all): ").lower()
 
-	# root url for all images to be downloaded
-	# based on their category
-	catalog_url = 'https://wallpaperscraft.com/catalog/'
+		start_page = int(input("Enter page number to start with: (default => 1): "))
+		end_page = int(input("Enter page number to end with: (default => 1: limit => 10): "))
 
-	if start_page > 0 and category != 'all':
-		for i in range(start_page, end_page+1):
-			# temporary url used to download page 1,2,3....
-			temp_url = catalog_url+category+f'/page{i}'
-			print("\nURL: ", temp_url)
-			print("Page number: ", i)
-			markup = get_markup(temp_url)
+		# based on their category
+		catalog_url = 'https://wallpaperscraft.com/catalog/'
+
+		if start_page > 0 and category != 'all':
+			for i in range(start_page, end_page+1):
+				# temporary url used to download page 1,2,3....
+				temp_url = catalog_url+category+f'/page{i}'
+				print("\nURL: ", temp_url)
+				print("Page number: ", i)
+				markup = get_markup(temp_url)
+				hrefs = parse(markup)
+				download(hrefs)
+		else:
+			markup = get_markup(URL)
 			hrefs = parse(markup)
 			download(hrefs)
-	else:
-		markup = get_markup(URL)
-		hrefs = parse(markup)
-		download(hrefs)
+	except ValueError:
+		print(C+"Page number should be a integer"+W)
+		search_catalog()
+
+	# root url for all images to be downloaded
+	
 
 
 if __name__ == '__main__':
@@ -162,6 +186,10 @@ if __name__ == '__main__':
 	try:
 		banner()
 		network()
+		menu()
 		search_catalog()
-	except KeyboardInterrupt:
-		sys.exit(0)
+	except (KeyboardInterrupt, errors.WantToCancelDownload, EOFError):
+		print(R+"Download has been cancalled.... Exitting now"+W)
+		sys.exit(12121)
+	except TypeError:
+		print(C+"Make sure you enter the category name correct and in the menu"+W)
