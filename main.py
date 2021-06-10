@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 import random
 import errors
 
-version = '0.1.0'
+version = '1.1.0'
 
 try:
 	os.mkdir("images")
